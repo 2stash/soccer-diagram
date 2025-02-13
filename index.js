@@ -45,21 +45,21 @@ shapes.push(new Player({ position: { x: 0, y: 0 }, number: 0 }));
 document.addEventListener('keydown', function (event) {
   if (event.key === 'Escape') {
     isAddingShape = false;
+    isMovingNewShape = false;
+    shapeToAdd = null;
+    draw_shapes();
   }
 });
 
 let add_shape = function (event) {
   isAddingShape = true;
-  // let mouseX = parseInt(event.clientX - offset_x);
-  // let mouseY = parseInt(event.clientY - offset_y);
-  // shapes.push(
-  //   new Player({ position: { x: mouseX, y: mouseY }, number: shapes.length })
-  // );
-  // draw_shapes();
 };
 
 let allow_move = function (event) {
   isAddingShape = false;
+  isMovingNewShape = false;
+  shapeToAdd = null;
+  draw_shapes();
 };
 
 // MOUSE EVENTS
@@ -81,9 +81,11 @@ let mouse_down = function (event) {
   }
 
   if (isMovingNewShape) {
-    isMovingNewShape = false;
+    shapeToAdd.color = 'rgba(255,0,0,1)';
     shapes.push(shapeToAdd);
     shapeToAdd = null;
+    isMovingNewShape = false;
+    isAddingShape = true;
     return;
   }
 
@@ -93,7 +95,9 @@ let mouse_down = function (event) {
   for (let shape of shapes) {
     if (is_mouse_in_shape(startX, startY, shape)) {
       current_shape_index = index;
+      shapes[current_shape_index].isMoving = true;
       is_draggin = true;
+      draw_shapes();
       return;
     }
 
@@ -107,6 +111,8 @@ let mouse_up = function (event) {
   }
   event.preventDefault();
   is_draggin = false;
+  shapes[current_shape_index].isMoving = false;
+  draw_shapes();
 };
 
 let mouse_out = function (event) {
@@ -127,6 +133,7 @@ let mouse_move = function (event) {
     let dy = mouseY - startY;
 
     let current_shape = shapes[current_shape_index];
+
     current_shape.position.x += dx;
     current_shape.position.y += dy;
 
@@ -141,10 +148,8 @@ let mouse_move = function (event) {
       shapeToAdd = new Player({
         position: { x: mouseXx, y: mouseYx },
         number: 0,
+        color: 'rgba(255,0,0,.25',
       });
-      console.log(mouseXx, mouseYx);
-      console.log(shapeToAdd.position.x, shapeToAdd.position.y);
-      console.log(shapeToAdd);
       draw_shapes();
       isMovingNewShape = true;
       isAddingShape = false;
