@@ -80,6 +80,13 @@ let mouse_down = function (event) {
     return;
   }
 
+  if (isMovingNewShape) {
+    isMovingNewShape = false;
+    shapes.push(shapeToAdd);
+    shapeToAdd = null;
+    return;
+  }
+
   startX = parseInt(event.clientX - offset_x);
   startY = parseInt(event.clientY - offset_y);
   let index = 0;
@@ -143,15 +150,11 @@ let mouse_move = function (event) {
       isAddingShape = false;
     }
   } else if (isMovingNewShape) {
-    console.log('moving new shape');
     let mouseX = parseInt(event.clientX - offset_x);
     let mouseY = parseInt(event.clientY - offset_y);
 
     let dx = mouseX - startX;
     let dy = mouseY - startY;
-
-    // shapeToAdd.position.x += dx;
-    // shapeToAdd.position.y += dy;
 
     shapeToAdd.position.x = mouseX;
     shapeToAdd.position.y = mouseY;
