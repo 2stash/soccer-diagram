@@ -7,9 +7,13 @@ canvas.height = 800;
 canvas.style.border = '5px solid red';
 let canvas_width = canvas.width;
 let canvas_height = canvas.height;
+let isAddingShape = false;
+let isMovingNewShape = false;
+let shapeToAdd = null;
+
+// Calculate offset of canvas from browser window
 let offset_x;
 let offset_y;
-
 let get_offset = function () {
   let canvas_offsets = canvas.getBoundingClientRect();
   offset_x = canvas_offsets.left;
@@ -29,14 +33,36 @@ canvas.onresize = function () {
   get_offset();
 };
 
+// SHAPES
 let shapes = [];
 let current_shape_index = null;
 let is_draggin = false;
 let startX;
 let startY;
-
 shapes.push(new Player({ position: { x: 0, y: 0 }, number: 0 }));
 
+// ADD SHAPE
+document.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape') {
+    isAddingShape = false;
+  }
+});
+
+let add_shape = function (event) {
+  isAddingShape = true;
+  // let mouseX = parseInt(event.clientX - offset_x);
+  // let mouseY = parseInt(event.clientY - offset_y);
+  // shapes.push(
+  //   new Player({ position: { x: mouseX, y: mouseY }, number: shapes.length })
+  // );
+  // draw_shapes();
+};
+
+let allow_move = function (event) {
+  isAddingShape = false;
+};
+
+// MOUSE EVENTS
 let is_mouse_in_shape = function (x, y, shape) {
   let shape_left = shape.position.x;
   let shape_right = shape.position.x + shape.width;
@@ -50,7 +76,9 @@ let is_mouse_in_shape = function (x, y, shape) {
 };
 
 let mouse_down = function (event) {
-  event.preventDefault();
+  if (isAddingShape) {
+    return;
+  }
 
   startX = parseInt(event.clientX - offset_x);
   startY = parseInt(event.clientY - offset_y);
@@ -83,9 +111,7 @@ let mouse_out = function (event) {
 };
 
 let mouse_move = function (event) {
-  if (!is_draggin) {
-    return;
-  } else {
+  if (is_draggin) {
     event.preventDefault();
     let mouseX = parseInt(event.clientX - offset_x);
     let mouseY = parseInt(event.clientY - offset_y);
@@ -100,6 +126,39 @@ let mouse_move = function (event) {
     draw_shapes();
     startX = mouseX;
     startY = mouseY;
+  } else if (isAddingShape) {
+    event.preventDefault();
+    let mouseXx = parseInt(event.clientX - offset_x);
+    let mouseYx = parseInt(event.clientY - offset_y);
+    if (shapeToAdd === null) {
+      shapeToAdd = new Player({
+        position: { x: mouseXx, y: mouseYx },
+        number: 0,
+      });
+      console.log(mouseXx, mouseYx);
+      console.log(shapeToAdd.position.x, shapeToAdd.position.y);
+      console.log(shapeToAdd);
+      draw_shapes();
+      isMovingNewShape = true;
+      isAddingShape = false;
+    }
+  } else if (isMovingNewShape) {
+    console.log('moving new shape');
+    let mouseX = parseInt(event.clientX - offset_x);
+    let mouseY = parseInt(event.clientY - offset_y);
+
+    let dx = mouseX - startX;
+    let dy = mouseY - startY;
+
+    // shapeToAdd.position.x += dx;
+    // shapeToAdd.position.y += dy;
+
+    shapeToAdd.position.x = mouseX;
+    shapeToAdd.position.y = mouseY;
+
+    draw_shapes();
+    startX = mouseX;
+    startY = mouseY;
   }
 };
 
@@ -108,11 +167,15 @@ canvas.onmouseup = mouse_up;
 canvas.onmouseout = mouse_out;
 canvas.onmousemove = mouse_move;
 
+// MAIN DRAWING FUNCTION
 let draw_shapes = function () {
   context.clearRect(0, 0, canvas_width, canvas_height);
 
   for (let shape of shapes) {
     shape.draw();
+  }
+  if (shapeToAdd) {
+    shapeToAdd.draw();
   }
 };
 
