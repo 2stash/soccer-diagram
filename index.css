@@ -1,0 +1,42 @@
+body {
+  margin: 0px;
+  padding: 30px;
+  overflow: hidden;
+  background: #313131;
+}
+
+canvas {
+  box-shadow: -3px 2px 9px 6px black;
+  cursor: pointer;
+}
+
+.field {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 50px;
+}
+
+.tools {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 50px;
+
+}
+
+.tools .button {
+  align-self: center;
+  width: 100px;
+  height: 40px;
+  border: 2px solid white;
+  cursor: pointer;
+  color: white;
+  background: #222;
+  margin: 0 10px;
+}
+
+.players {
+  margin-top: 50px;
+}
