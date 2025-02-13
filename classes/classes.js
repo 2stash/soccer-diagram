@@ -3,12 +3,12 @@ class Player {
     this.position = position;
     this.width = 64;
     this.height = 64;
-    this.color = 'rgba(255,255,255, .1)';
+    this.color = 'red';
     this.number = number;
   }
 
   draw() {
-    c.fillStyle = 'black';
-    c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    context.fillStyle = this.color;
+    context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }

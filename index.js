@@ -35,16 +35,13 @@ let is_draggin = false;
 let startX;
 let startY;
 
-shapes.push({ x: 200, y: 50, width: 200, height: 200, color: 'red' });
+shapes.push(new Player({ position: { x: 0, y: 0 }, number: 0 }));
 
 let is_mouse_in_shape = function (x, y, shape) {
-  console.log('is_mouse_in_shape');
-  let shape_left = shape.x;
-  let shape_right = shape.x + shape.width;
-  let shape_top = shape.y;
-  let shape_bottom = shape.y + shape.height;
-  console.log(shape_right, x, shape_left);
-  console.log(shape_bottom, y, shape_top);
+  let shape_left = shape.position.x;
+  let shape_right = shape.position.x + shape.width;
+  let shape_top = shape.position.y;
+  let shape_bottom = shape.position.y + shape.height;
   if (x > shape_left && x < shape_right && y > shape_top && y < shape_bottom) {
     return true;
   }
@@ -55,15 +52,11 @@ let is_mouse_in_shape = function (x, y, shape) {
 let mouse_down = function (event) {
   event.preventDefault();
 
-  console.log(current_shape_index);
-  console.log(shapes);
   startX = parseInt(event.clientX - offset_x);
   startY = parseInt(event.clientY - offset_y);
-  console.log(startX, startY);
   let index = 0;
   for (let shape of shapes) {
     if (is_mouse_in_shape(startX, startY, shape)) {
-      console.log('mouse in shape');
       current_shape_index = index;
       is_draggin = true;
       return;
@@ -101,11 +94,10 @@ let mouse_move = function (event) {
     let dy = mouseY - startY;
 
     let current_shape = shapes[current_shape_index];
-    current_shape.x += dx;
-    current_shape.y += dy;
+    current_shape.position.x += dx;
+    current_shape.position.y += dy;
 
     draw_shapes();
-    console.log(current_shape_index);
     startX = mouseX;
     startY = mouseY;
   }
@@ -120,8 +112,7 @@ let draw_shapes = function () {
   context.clearRect(0, 0, canvas_width, canvas_height);
 
   for (let shape of shapes) {
-    context.fillStyle = shape.color;
-    context.fillRect(shape.x, shape.y, shape.width, shape.height);
+    shape.draw();
   }
 };
 
