@@ -55,7 +55,6 @@ let isArrowDragging = false;
 
 let add_arrow = function () {
   isAddingArrow = true;
-  console.log('add_arrow');
 };
 
 // STORAGE
@@ -103,6 +102,17 @@ document.addEventListener('keydown', function (event) {
     isArrowDragging = false;
     resetShapes();
     draw_shapes();
+  } else if (event.key === 'Delete') {
+    if (current_shape_index !== null) {
+      shapes.splice(current_shape_index, 1);
+      current_shape_index = null;
+    } else if (current_arrow_index !== null) {
+      arrowsArray.splice(current_arrow_index, 1);
+      current_arrow_index = null;
+    }
+    resetShapes();
+    saveData();
+    draw_shapes();
   }
 });
 
@@ -116,6 +126,9 @@ let allow_move = function (event) {
   isAddingShape = false;
   isMovingNewShape = false;
   shapeToAdd = null;
+  isAddingArrow = false;
+  isArrowDragging = false;
+  isMovingNewArrow = false;
   resetShapes();
   draw_shapes();
 };
@@ -155,7 +168,6 @@ let is_mouse_in_arrow = function (x, y, arrow) {
       : arrow.position.endY;
 
   if (x > shape_left && x < shape_right && y > shape_top && y < shape_bottom) {
-    console.log('true');
     return true;
   }
   return false;
@@ -163,6 +175,7 @@ let is_mouse_in_arrow = function (x, y, arrow) {
 
 // Handle all mouse down events
 let mouse_down = function (event) {
+  resetShapes();
   if (isAddingShape) {
     // isAddingShape is only true at the very start of adding a new shape, and goes to false once we are moving that shape
     // this check is so the code for checking if mouse_down is in a shape does not run
@@ -176,6 +189,7 @@ let mouse_down = function (event) {
     shapeToAdd = null;
     isMovingNewShape = false;
     isAddingShape = true;
+    saveData();
     return;
   }
   // initial mousedown to start beginning of arrow
@@ -195,7 +209,6 @@ let mouse_down = function (event) {
     isMovingNewArrow = false;
     isAddingArrow = true;
     saveData();
-    console.log('mouse down arrow added');
     return;
   }
 
@@ -216,7 +229,6 @@ let mouse_down = function (event) {
   }
 
   index = 0;
-  console.log('mouse down', startX, startY);
   for (let arrow of arrowsArray) {
     if (is_mouse_in_arrow(startX, startY, arrow)) {
       current_arrow_index = index;
@@ -312,7 +324,6 @@ let mouse_move = function (event) {
     arrowToAdd.position.endY = mouseY;
 
     draw_shapes();
-    console.log('moving new arrow');
   } else if (isArrowDragging) {
     let mouseX = parseInt(event.clientX - offset_x);
     let mouseY = parseInt(event.clientY - offset_y);
@@ -320,7 +331,6 @@ let mouse_move = function (event) {
     let dy = mouseY - startY;
     let currentArrow = arrowsArray[current_arrow_index];
 
-    console.log();
     currentArrow.position.startX += dx;
     currentArrow.position.startY += dy;
     currentArrow.position.endX += dx;
@@ -329,7 +339,6 @@ let mouse_move = function (event) {
     draw_shapes();
     startX = mouseX;
     startY = mouseY;
-    console.log('moving arrow');
   }
 };
 
@@ -343,6 +352,8 @@ canvas.onmousemove = mouse_move;
 let resetShapes = function () {
   for (let shape of shapes) {
     shape.isMoving = false;
+    current_arrow_index = null;
+    current_shape_index = null;
   }
 };
 
