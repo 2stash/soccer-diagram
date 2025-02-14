@@ -60,11 +60,13 @@ let add_arrow = function () {
 // STORAGE
 let data = {
   shapes: [new Player({ position: { x: 0, y: 0 }, number: 0 })],
+  arrowsArray: [],
 };
 
 let reset_local_storage = function () {
   localStorage.removeItem('data');
   shapes = [];
+  arrowsArray = [];
   draw_shapes();
 };
 let initialize_local_storage = function () {
@@ -73,6 +75,9 @@ let initialize_local_storage = function () {
     for (let shape of data.shapes) {
       shapes.push(new Player(shape));
     }
+    for (let arrow of data.arrowsArray) {
+      arrowsArray.push(new Arrow(arrow));
+    }
   } else {
     localStorage.setItem('data', JSON.stringify(data));
   }
@@ -80,7 +85,7 @@ let initialize_local_storage = function () {
 initialize_local_storage();
 
 let saveData = function () {
-  data = { shapes };
+  data = { shapes, arrowsArray };
   localStorage.setItem('data', JSON.stringify(data));
 };
 
@@ -160,6 +165,7 @@ let mouse_down = function (event) {
     arrowToAdd = null;
     isMovingNewArrow = false;
     isAddingArrow = true;
+    saveData();
     console.log('mouse down arrow added');
   }
 
@@ -234,7 +240,7 @@ let mouse_move = function (event) {
       isAddingShape = false;
     }
   }
-  // moving new shape that has not bee placed yet
+  // moving new shape that has not been placed yet
   else if (isMovingNewShape) {
     let mouseX = parseInt(event.clientX - offset_x);
     let mouseY = parseInt(event.clientY - offset_y);
@@ -248,7 +254,9 @@ let mouse_move = function (event) {
     draw_shapes();
     startX = mouseX;
     startY = mouseY;
-  } else if (isMovingNewArrow) {
+  }
+  // moving end of new arrow that has not been placed yet
+  else if (isMovingNewArrow) {
     let mouseX = parseInt(event.clientX - offset_x);
     let mouseY = parseInt(event.clientY - offset_y);
 
