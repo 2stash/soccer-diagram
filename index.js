@@ -51,6 +51,7 @@ let current_arrow_index = null;
 let isAddingArrow = false;
 let isMovingNewArrow = false;
 let arrowToAdd = null;
+let isArrowDragging = false;
 
 let add_arrow = function () {
   isAddingArrow = true;
@@ -99,6 +100,7 @@ document.addEventListener('keydown', function (event) {
     isAddingArrow = false;
     isMovingNewArrow = false;
     arrowToAdd = null;
+    isArrowDragging = false;
     resetShapes();
     draw_shapes();
   }
@@ -129,6 +131,33 @@ let is_mouse_in_shape = function (x, y, shape) {
     return true;
   }
 
+  return false;
+};
+
+let is_mouse_in_arrow = function (x, y, arrow) {
+  // arrow starting and ending points can be on either side, so need to find which is farthest left and right, and farthest top and bottom
+
+  let shape_left =
+    arrow.position.startX < arrow.position.endX
+      ? arrow.position.startX
+      : arrow.position.endX;
+  let shape_right =
+    arrow.position.startX > arrow.position.endX
+      ? arrow.position.startX + 10 // +10 is to make the hitbox bigger
+      : arrow.position.endX + 10; //  +10 is to make the hitbox bigger
+  let shape_top =
+    arrow.position.startY < arrow.position.endY
+      ? arrow.position.startY + 10 // +10 is to make the hitbox bigger
+      : arrow.position.endY + 10; //  +10 is to make the hitbox bigger
+  let shape_bottom =
+    arrow.position.startY > arrow.position.endY
+      ? arrow.position.startY
+      : arrow.position.endY;
+
+  if (x > shape_left && x < shape_right && y > shape_top && y < shape_bottom) {
+    console.log('true');
+    return true;
+  }
   return false;
 };
 
@@ -167,6 +196,7 @@ let mouse_down = function (event) {
     isAddingArrow = true;
     saveData();
     console.log('mouse down arrow added');
+    return;
   }
 
   // Calculate mouse position and allow dragging if mouse is over a shape
@@ -184,6 +214,19 @@ let mouse_down = function (event) {
     }
     index++;
   }
+
+  index = 0;
+  console.log('mouse down', startX, startY);
+  for (let arrow of arrowsArray) {
+    if (is_mouse_in_arrow(startX, startY, arrow)) {
+      current_arrow_index = index;
+      // arrowsArray[current_arrow_index].isMoving = true;
+      isArrowDragging = true;
+      draw_shapes();
+      return;
+    }
+    index++;
+  }
 };
 
 // Handle all mouse up events
@@ -191,6 +234,11 @@ let mouse_up = function (event) {
   if (is_draggin) {
     event.preventDefault();
     is_draggin = false;
+    draw_shapes();
+    saveData();
+  } else if (isArrowDragging) {
+    event.preventDefault();
+    isArrowDragging = false;
     draw_shapes();
     saveData();
   }
@@ -265,6 +313,23 @@ let mouse_move = function (event) {
 
     draw_shapes();
     console.log('moving new arrow');
+  } else if (isArrowDragging) {
+    let mouseX = parseInt(event.clientX - offset_x);
+    let mouseY = parseInt(event.clientY - offset_y);
+    let dx = mouseX - startX;
+    let dy = mouseY - startY;
+    let currentArrow = arrowsArray[current_arrow_index];
+
+    console.log();
+    currentArrow.position.startX += dx;
+    currentArrow.position.startY += dy;
+    currentArrow.position.endX += dx;
+    currentArrow.position.endY += dy;
+
+    draw_shapes();
+    startX = mouseX;
+    startY = mouseY;
+    console.log('moving arrow');
   }
 };
 
@@ -297,7 +362,6 @@ let draw_shapes = function () {
   }
 
   if (arrowToAdd) {
-    console.log('drawing arrow');
     arrowToAdd.draw();
   }
 };
