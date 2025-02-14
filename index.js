@@ -13,6 +13,24 @@ let isAddingShape = false; // are we in the state of adding a shape
 let isMovingNewShape = false; // are we in the state of moving a new shape
 let shapeToAdd = null; // object to store temp shape to be added
 
+// SHAPES
+let shapes = [];
+let current_shape_index = null; // used to find current shape in shapes array
+let is_draggin = false; // is the current shape being dragged
+let startX;
+let startY;
+
+// TODO: Optimize data class, do we need an array for each type of object?
+// Make a class for each type of object? and a super class?
+// Arrows
+let arrowsArray = [];
+let current_arrow_index = null;
+
+let isAddingArrow = false;
+let isMovingNewArrow = false;
+let arrowToAdd = null;
+let isArrowDragging = false;
+
 // Calculate offset of canvas from browser window
 let offset_x;
 let offset_y;
@@ -34,24 +52,6 @@ window.onresize = function () {
 canvas.onresize = function () {
   get_offset();
 };
-
-// SHAPES
-let shapes = [];
-let current_shape_index = null; // used to find current shape in shapes array
-let is_draggin = false; // is the current shape being dragged
-let startX;
-let startY;
-
-// TODO: Optimize data class, do we need an array for each type of object?
-// Make a class for each type of object? and a super class?
-// Arrows
-let arrowsArray = [];
-let current_arrow_index = null;
-
-let isAddingArrow = false;
-let isMovingNewArrow = false;
-let arrowToAdd = null;
-let isArrowDragging = false;
 
 let add_arrow = function () {
   isAddingArrow = true;
@@ -188,7 +188,7 @@ let mouse_down = function (event) {
     shapes.push(shapeToAdd);
     shapeToAdd = null;
     isMovingNewShape = false;
-    isAddingShape = true;
+    isAddingShape = true; // this is so we can add another shape
     saveData();
     return;
   }
@@ -207,7 +207,7 @@ let mouse_down = function (event) {
     arrowsArray.push(arrowToAdd);
     arrowToAdd = null;
     isMovingNewArrow = false;
-    isAddingArrow = true;
+    isAddingArrow = true; // this is so we can add another arrow
     saveData();
     return;
   }
@@ -232,6 +232,7 @@ let mouse_down = function (event) {
   for (let arrow of arrowsArray) {
     if (is_mouse_in_arrow(startX, startY, arrow)) {
       current_arrow_index = index;
+      // TODO add isMoving to arrow class
       // arrowsArray[current_arrow_index].isMoving = true;
       isArrowDragging = true;
       draw_shapes();
@@ -258,22 +259,21 @@ let mouse_up = function (event) {
 
 // Handle all mouse out events
 let mouse_out = function (event) {
-  if (is_draggin) {
-    event.preventDefault();
-    is_draggin = false;
-  }
+  is_draggin = false;
+  isArrowDragging = false;
 };
 
 // Handle all mouse move events
 let mouse_move = function (event) {
   // draging existing shape
+  let mouseX = parseInt(event.clientX - offset_x);
+  let mouseY = parseInt(event.clientY - offset_y);
+  let dx = mouseX - startX;
+  let dy = mouseY - startY;
+
+  console.log(mouseX, mouseY);
   if (is_draggin) {
     event.preventDefault();
-    let mouseX = parseInt(event.clientX - offset_x);
-    let mouseY = parseInt(event.clientY - offset_y);
-
-    let dx = mouseX - startX;
-    let dy = mouseY - startY;
 
     let current_shape = shapes[current_shape_index];
 
@@ -287,11 +287,10 @@ let mouse_move = function (event) {
   // initial check to add a new shape before changing state to isMovingNewShape = true
   else if (isAddingShape) {
     event.preventDefault();
-    let mouseXx = parseInt(event.clientX - offset_x);
-    let mouseYx = parseInt(event.clientY - offset_y);
+
     if (shapeToAdd === null) {
       shapeToAdd = new Player({
-        position: { x: mouseXx, y: mouseYx },
+        position: { x: mouseX, y: mouseY },
         number: 0,
         color: 'rgba(255,0,0,.25',
       });
@@ -302,12 +301,6 @@ let mouse_move = function (event) {
   }
   // moving new shape that has not been placed yet
   else if (isMovingNewShape) {
-    let mouseX = parseInt(event.clientX - offset_x);
-    let mouseY = parseInt(event.clientY - offset_y);
-
-    let dx = mouseX - startX;
-    let dy = mouseY - startY;
-
     shapeToAdd.position.x = mouseX;
     shapeToAdd.position.y = mouseY;
 
@@ -317,18 +310,11 @@ let mouse_move = function (event) {
   }
   // moving end of new arrow that has not been placed yet
   else if (isMovingNewArrow) {
-    let mouseX = parseInt(event.clientX - offset_x);
-    let mouseY = parseInt(event.clientY - offset_y);
-
     arrowToAdd.position.endX = mouseX;
     arrowToAdd.position.endY = mouseY;
 
     draw_shapes();
   } else if (isArrowDragging) {
-    let mouseX = parseInt(event.clientX - offset_x);
-    let mouseY = parseInt(event.clientY - offset_y);
-    let dx = mouseX - startX;
-    let dy = mouseY - startY;
     let currentArrow = arrowsArray[current_arrow_index];
 
     currentArrow.position.startX += dx;
