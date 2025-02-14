@@ -4,27 +4,70 @@ class Player {
     number = 0,
     color = 'rgba(255,0,0,1)',
     isMoving = false,
+    shape = 'circle',
   }) {
     this.position = position;
     this.width = 64;
     this.height = 64;
+    this.radius = 25;
     this.color = color;
     this.number = number;
     this.isMoving = isMoving;
+    this.shape = shape;
   }
 
   draw() {
-    if (this.isMoving) {
-      context.fillStyle = 'pink';
-      context.fillRect(
+    if (this.shape === 'circle') {
+      if (this.isMoving) {
+        context.fillStyle = 'rgba(255,0,0,.5)';
+        context.beginPath();
+        context.arc(
+          this.position.x,
+          this.position.y,
+          this.radius + 5,
+          0,
+          2 * Math.PI
+        );
+        context.fill();
+      }
+
+      context.beginPath();
+      context.arc(
         this.position.x,
         this.position.y,
-        this.width + 15,
-        this.height + 15
+        this.radius,
+        0,
+        2 * Math.PI
       );
+      context.fillStyle = this.color;
+      context.fill();
+
+      context.font = '30px Arial';
+      context.fillStyle = 'white';
+      context.fillText(this.number, this.position.x - 10, this.position.y + 10);
+    } else if (this.shape === 'triangle') {
+      if (this.isMoving) {
+        context.fillStyle = 'rgba(255,0,0,.5)';
+        context.beginPath();
+        context.moveTo(this.position.x, this.position.y - 30);
+        context.lineTo(this.position.x - 30, this.position.y + 30);
+        context.lineTo(this.position.x + 30, this.position.y + 30);
+        context.closePath();
+        context.fill();
+      }
+
+      context.beginPath();
+      context.moveTo(this.position.x, this.position.y - 25);
+      context.lineTo(this.position.x - 25, this.position.y + 25);
+      context.lineTo(this.position.x + 25, this.position.y + 25);
+      context.closePath();
+      context.fillStyle = this.color;
+      context.fill();
+
+      context.font = '30px Arial';
+      context.fillStyle = 'white';
+      context.fillText(this.number, this.position.x - 8, this.position.y + 18);
     }
-    context.fillStyle = this.color;
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
 
@@ -32,7 +75,7 @@ class Arrow {
   constructor({
     position = { startX, startY, endX, endY },
     radius = 10,
-    color = 'green',
+    color = 'black',
     lineWidth = 5, // will be shown in the saved version but is not connected to the preview width of the arrow
   }) {
     this.position = position;
@@ -48,6 +91,7 @@ class Arrow {
     let angle;
     let x;
     let y;
+    context.fillStyle = this.color;
     context.lineWidth = this.lineWidth;
     context.beginPath();
     context.moveTo(this.position.startX, this.position.startY);
@@ -82,5 +126,19 @@ class Arrow {
     context.closePath();
 
     context.fill();
+  }
+}
+
+class FocusPlayer {
+  constructor() {
+    this.color = 'rgba(0,0,255,1)';
+    this.shape = 'triangle';
+  }
+}
+
+class OppositionPlayer {
+  constructor() {
+    this.color = 'rgba(255,0,0,1)';
+    this.shape = 'circle';
   }
 }

@@ -4,7 +4,6 @@ let context = canvas.getContext('2d');
 
 canvas.width = 640;
 canvas.height = 800;
-canvas.style.border = '5px solid green';
 let canvas_width = canvas.width;
 let canvas_height = canvas.height;
 
@@ -17,6 +16,7 @@ let shapeToAdd = null; // object to store temp shape to be added
 let shapes = [];
 let current_shape_index = null; // used to find current shape in shapes array
 let is_draggin = false; // is the current shape being dragged
+let typeOfShapeToAdd = null;
 let startX;
 let startY;
 
@@ -117,7 +117,12 @@ document.addEventListener('keydown', function (event) {
 });
 
 // State is set to adding a shape
-let add_shape = function (event) {
+let add_player = function (value) {
+  if (value === 'focus-player') {
+    typeOfShapeToAdd = new FocusPlayer();
+  } else if (value === 'opposition-player') {
+    typeOfShapeToAdd = new OppositionPlayer();
+  }
   isAddingShape = true;
 };
 
@@ -135,10 +140,22 @@ let allow_move = function (event) {
 
 // MOUSE EVENTS
 // Check if mouse is in shape so it can be dragged
-let is_mouse_in_shape = function (x, y, shape) {
-  let shape_left = shape.position.x;
-  let shape_right = shape.position.x + shape.width;
-  let shape_top = shape.position.y;
+// let is_mouse_in_shape = function (x, y, shape) {
+//   let shape_left = shape.position.x;
+//   let shape_right = shape.position.x + shape.width;
+//   let shape_top = shape.position.y;
+//   let shape_bottom = shape.position.y + shape.height;
+//   if (x > shape_left && x < shape_right && y > shape_top && y < shape_bottom) {
+//     return true;
+//   }
+
+//   return false;
+// };
+
+let is_mouse_in_circle = function (x, y, shape) {
+  let shape_left = shape.position.x - shape.radius;
+  let shape_right = shape.position.x + shape.radius;
+  let shape_top = shape.position.y - shape.radius;
   let shape_bottom = shape.position.y + shape.height;
   if (x > shape_left && x < shape_right && y > shape_top && y < shape_bottom) {
     return true;
@@ -184,7 +201,7 @@ let mouse_down = function (event) {
 
   // if we are moving a new shape, then we need to add it to the shapes array
   else if (isMovingNewShape) {
-    shapeToAdd.color = 'rgba(255,0,0,1)';
+    // shapeToAdd.color = 'rgba(255,0,0,1)';
     shapes.push(shapeToAdd);
     shapeToAdd = null;
     isMovingNewShape = false;
@@ -218,7 +235,7 @@ let mouse_down = function (event) {
   let index = 0;
   resetShapes();
   for (let shape of shapes) {
-    if (is_mouse_in_shape(startX, startY, shape)) {
+    if (is_mouse_in_circle(startX, startY, shape)) {
       current_shape_index = index;
       shapes[current_shape_index].isMoving = true;
       is_draggin = true;
@@ -271,7 +288,6 @@ let mouse_move = function (event) {
   let dx = mouseX - startX;
   let dy = mouseY - startY;
 
-  console.log(mouseX, mouseY);
   if (is_draggin) {
     event.preventDefault();
 
@@ -292,7 +308,8 @@ let mouse_move = function (event) {
       shapeToAdd = new Player({
         position: { x: mouseX, y: mouseY },
         number: 0,
-        color: 'rgba(255,0,0,.25',
+        color: typeOfShapeToAdd.color,
+        shape: typeOfShapeToAdd.shape,
       });
       draw_shapes();
       isMovingNewShape = true;

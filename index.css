@@ -2,11 +2,11 @@ body {
   margin: 0px;
   padding: 30px;
   overflow: hidden;
-  background: #313131;
+  /* background: #313131; */
 }
 
 canvas {
-  box-shadow: -3px 2px 9px 6px black;
+  box-shadow: -3px 2px 9px 6px grey;
   cursor: pointer;
 }
 

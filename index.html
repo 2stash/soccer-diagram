@@ -14,8 +14,19 @@
       </div>
       <canvas id="canvas"></canvas>
       <div class="players">
-        <button class="player" data-player="player" onClick="add_shape()">
-          Add Player
+        <button
+          class="player"
+          value="focus-player"
+          onClick="add_player(this.value)"
+        >
+          Add FOCUS Player
+        </button>
+        <button
+          class="player"
+          value="opposition-player"
+          onClick="add_player(this.value)"
+        >
+          Add OPP Player
         </button>
         <button class="arrow" data-player="arrow" onClick="add_arrow()">
           Add Arrow
