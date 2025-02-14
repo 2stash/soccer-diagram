@@ -42,6 +42,21 @@ let is_draggin = false; // is the current shape being dragged
 let startX;
 let startY;
 
+// TODO: Optimize data class, do we need an array for each type of object?
+// Make a class for each type of object? and a super class?
+// Arrows
+let arrowsArray = [];
+let current_arrow_index = null;
+
+let isAddingArrow = false;
+let isMovingNewArrow = false;
+let arrowToAdd = null;
+
+let add_arrow = function () {
+  isAddingArrow = true;
+  console.log('add_arrow');
+};
+
 // STORAGE
 let data = {
   shapes: [new Player({ position: { x: 0, y: 0 }, number: 0 })],
@@ -69,12 +84,16 @@ let saveData = function () {
   localStorage.setItem('data', JSON.stringify(data));
 };
 
-// ADD SHAPE
+// Keyboard events
 document.addEventListener('keydown', function (event) {
+  // Escape key should act like normal, unselects shape, etc.
   if (event.key === 'Escape') {
     isAddingShape = false;
     isMovingNewShape = false;
     shapeToAdd = null;
+    isAddingArrow = false;
+    isMovingNewArrow = false;
+    arrowToAdd = null;
     resetShapes();
     draw_shapes();
   }
@@ -117,13 +136,31 @@ let mouse_down = function (event) {
   }
 
   // if we are moving a new shape, then we need to add it to the shapes array
-  if (isMovingNewShape) {
+  else if (isMovingNewShape) {
     shapeToAdd.color = 'rgba(255,0,0,1)';
     shapes.push(shapeToAdd);
     shapeToAdd = null;
     isMovingNewShape = false;
     isAddingShape = true;
     return;
+  }
+  // initial mousedown to start beginning of arrow
+  else if (isAddingArrow) {
+    startX = parseInt(event.clientX - offset_x);
+    startY = parseInt(event.clientY - offset_y);
+    isAddingArrow = false;
+    isMovingNewArrow = true;
+    arrowToAdd = new Arrow({ position: { startX, startY, startX, startY } });
+    return;
+  }
+
+  // starting point of arrow has been selected and we are moving the mouse to select the end point
+  else if (isMovingNewArrow) {
+    arrowsArray.push(arrowToAdd);
+    arrowToAdd = null;
+    isMovingNewArrow = false;
+    isAddingArrow = true;
+    console.log('mouse down arrow added');
   }
 
   // Calculate mouse position and allow dragging if mouse is over a shape
@@ -211,6 +248,15 @@ let mouse_move = function (event) {
     draw_shapes();
     startX = mouseX;
     startY = mouseY;
+  } else if (isMovingNewArrow) {
+    let mouseX = parseInt(event.clientX - offset_x);
+    let mouseY = parseInt(event.clientY - offset_y);
+
+    arrowToAdd.position.endX = mouseX;
+    arrowToAdd.position.endY = mouseY;
+
+    draw_shapes();
+    console.log('moving new arrow');
   }
 };
 
@@ -236,6 +282,15 @@ let draw_shapes = function () {
   }
   if (shapeToAdd) {
     shapeToAdd.draw();
+  }
+
+  for (let arrow of arrowsArray) {
+    arrow.draw();
+  }
+
+  if (arrowToAdd) {
+    console.log('drawing arrow');
+    arrowToAdd.draw();
   }
 };
 
