@@ -278,6 +278,14 @@ let mouse_up = function (event) {
 let mouse_out = function (event) {
   is_draggin = false;
   isArrowDragging = false;
+
+  // reset selected shape to null when scorlling off the screen
+  // can change later to some other functionality
+  shapeToAdd = null;
+  isMovingNewShape = false;
+
+  resetShapes();
+  draw_shapes();
 };
 
 // Handle all mouse move events
