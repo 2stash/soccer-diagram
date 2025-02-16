@@ -7,37 +7,53 @@
     <title>Soccer Diagram</title>
   </head>
   <body>
-    <div class="field">
-      <div class="tools">
-        <button id="clear" onClick="reset_local_storage()">Clear</button>
-        <button id="save" onClick="saveData()">Save</button>
-      </div>
-      <canvas id="canvas"></canvas>
-      <div class="players">
-        <button
-          class="player"
-          value="focus-player"
-          onClick="add_player(this.value)"
-        >
-          Add FOCUS Player
-        </button>
-        <button
-          class="player"
-          value="opposition-player"
-          onClick="add_player(this.value)"
-        >
-          Add OPP Player
-        </button>
-        <button class="arrow" data-player="arrow" onClick="add_arrow()">
-          Add Arrow
-        </button>
-        <button class="player" data-player="move" onClick="allow_move()">
-          Move Tool
-        </button>
+    <div class="container">
+      <div class="entire-display">
+        <div class="tools">
+          <button id="clear" onClick="reset_local_storage()">Clear</button>
+          <button id="save" onClick="saveData()">Save</button>
+        </div>
+        <div class="main-display">
+          <div class="selection-tool-bar">
+            <button
+              class="move selection-tool-button"
+              data-player="move"
+              onClick="allow_move()"
+            ></button>
+            <button
+              class="triangle selection-tool-button"
+              value="focus-player"
+              onClick="add_player(this.value)"
+            ></button>
+            <button
+              class="circle selection-tool-button"
+              value="opposition-player"
+              onClick="add_player(this.value)"
+            ></button>
+            <button
+              class="arrow selection-tool-button"
+              data-player="arrow"
+              onClick="add_arrow()"
+            ></button>
+          </div>
+          <canvas id="canvas"></canvas>
+          <div class="info-display">
+            <h4>Current Tool</h4>
+            <form>
+              <label for="number">Number</label>
+              <input type="number" id="number" name="number" />
+            </form>
+          </div>
+        </div>
       </div>
     </div>
+
     <script scr="storage.js"></script>
     <script src="./classes/classes.js"></script>
     <script src="index.js"></script>
   </body>
+
+  <!-- <a target="_blank" href="https://icons8.com/icon/60362/filled-circle">Filled Circle</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a> -->
+
+  <!-- <a href="https://www.flaticon.com/free-icons/move" title="move icons">Move icons created by Andrean Prabowo - Flaticon</a> -->
 </html>

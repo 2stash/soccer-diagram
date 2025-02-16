@@ -2,8 +2,9 @@
 let canvas = document.getElementById('canvas');
 let context = canvas.getContext('2d');
 
-canvas.width = 640;
-canvas.height = 800;
+canvas.width = 736;
+canvas.height = 1104;
+
 let canvas_width = canvas.width;
 let canvas_height = canvas.height;
 
