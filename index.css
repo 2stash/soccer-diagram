@@ -2,11 +2,16 @@
   box-sizing: border-box;
 }
 
+:root {
+  --background-off-white: #ffffff;
+  --background-light-grey: #f3f3f3:
+}
+
 body {
   margin: 0px;
   padding: 30px;
   overflow: hidden;
-  background-color: #f3f3f3;
+  background-color: var(--background-light-grey);
 }
 
 .container {
@@ -36,7 +41,7 @@ canvas {
   display: flex;
   justify-content: left;
   flex-direction: row;
-  background-color: #F5f5f5;
+  background-color: var(--background-off-white);
   width: 100%;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -49,7 +54,7 @@ canvas {
   height: 40px;
   cursor: pointer;
   color: black;
-  background: #ffffff;
+  background: var(--background-off-white);
   margin: 10px 10px 5px 0;
   border: none;
   border-radius: 5px;
@@ -59,12 +64,14 @@ canvas {
   display: flex;
   flex-direction: row;
   width: 100%;
+  background-color: var(--background-off-white);
+  margin-bottom: 25px;
 }
 
 .selection-tool-bar {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
+  background-color: var(--background-off-white);
   margin: 20px 2px 2px 2px;
 }
 
@@ -72,7 +79,7 @@ canvas {
   width: 50px;
   height: 50px;
   background-size: cover;
-  background-color: #ffffff;
+  background-color: var(--background-off-white);
   border-radius: 5px;
   border: none;
   margin-top: 15px;
@@ -99,7 +106,13 @@ canvas {
 .info-display {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  padding: 8px;
+}
+
+input[type='number'] {
   width: 100%;
-  background-color: #F5f5f5;
+}
+
+.hidden {
+  display: none;
 }

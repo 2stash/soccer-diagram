@@ -1,6 +1,15 @@
 // GLOBAL VARIABLES
 let canvas = document.getElementById('canvas');
 let context = canvas.getContext('2d');
+let playerNumber = document.getElementById('position');
+const formForPosition = document.getElementById('form-for-position');
+
+playerNumber.addEventListener('input', (event) => {
+  if (current_shape_index != null) {
+    shapes[current_shape_index].number = playerNumber.value;
+    draw_shapes();
+  }
+});
 
 canvas.width = 736;
 canvas.height = 1104;
@@ -101,6 +110,12 @@ document.addEventListener('keydown', function (event) {
     isMovingNewArrow = false;
     arrowToAdd = null;
     isArrowDragging = false;
+    for (let shape of shapes) {
+      shape.isMoving = false;
+      current_arrow_index = null;
+      current_shape_index = null;
+    }
+    formForPosition.classList.add('hidden');
     resetShapes();
     draw_shapes();
   } else if (event.key === 'Delete') {
@@ -240,6 +255,7 @@ let mouse_down = function (event) {
       current_shape_index = index;
       shapes[current_shape_index].isMoving = true;
       is_draggin = true;
+      populateInfoArea();
       draw_shapes();
       return;
     }
@@ -363,10 +379,17 @@ canvas.onmousemove = mouse_move;
 // RESET SHAPES to default values
 let resetShapes = function () {
   for (let shape of shapes) {
-    shape.isMoving = false;
-    current_arrow_index = null;
-    current_shape_index = null;
+    // shape.isMoving = false;
+    // current_arrow_index = null;
+    // current_shape_index = null;
   }
+};
+
+//
+let populateInfoArea = function () {
+  formForPosition.classList.remove('hidden');
+  let currentPlayerNumber = shapes[current_shape_index].number;
+  playerNumber.value = currentPlayerNumber;
 };
 
 // MAIN DRAWING FUNCTION
