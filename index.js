@@ -4,25 +4,39 @@ let context = canvas.getContext('2d');
 let playerNumber = document.getElementById('position');
 const formForPosition = document.getElementById('form-for-position');
 
+canvas.width = 736;
+canvas.height = 1104;
+
+let canvas_width = canvas.width;
+let canvas_height = canvas.height;
+
 // STATE
 let xxxmouseIsOverCanvas = false; // TODO use:
 let xxxdraggingExistingShape = false;
 
-let xxxshapeAddingToolButtonHasBeenClicked = false;
-let xxxmovingPotentialNewShape = false;
-let xxxtypeOfShapeToAdd = null;
-let xxxshapeToAdd = null;
-let xxxshapesToDrawOnCanvas = [];
+let shapeAddingToolButtonHasBeenClicked = false;
+let movingPotentialNewShape = false;
+let typeOfShapeToAdd = null;
+let shapeToAdd = null;
+let shapes = [];
+
+let isDraggingExistingShape = false; // is the current shape being dragged
+let current_shape_index = null; // used to find current shape in shapes array
+let typeOfShapeMoving;
 
 let startX;
 let startY;
 
-let xxx_is_draggin = false; // is the current shape being dragged
-let xxx_current_shape_index = null; // used to find current shape in shapes array
-let xxxtypeOfShapeMoving;
-
-let shapes = [];
-let current_shape_index = null; // used to find current shape in shapes array
+const state = {
+  shapeAddingToolButtonHasBeenClicked,
+  movingPotentialNewShape,
+  typeOfShapeToAdd,
+  shapeToAdd,
+  isDraggingExistingShape,
+  current_shape_index,
+  typeOfShapeMoving,
+  shapes,
+};
 
 playerNumber.addEventListener('input', (event) => {
   if (current_shape_index != null) {
@@ -30,16 +44,6 @@ playerNumber.addEventListener('input', (event) => {
     draw_shapes();
   }
 });
-
-canvas.width = 736;
-canvas.height = 1104;
-
-let canvas_width = canvas.width;
-let canvas_height = canvas.height;
-
-// TODO: Optimize data class, do we need an array for each type of object?
-// Make a class for each type of object? and a super class?
-// Arrows
 
 // Calculate offset of canvas from browser window
 let offset_x;
@@ -99,37 +103,37 @@ document.addEventListener('keydown', function (event) {
   // Escape key should act like normal, unselects shape, etc.
   if (event.key === 'Escape') {
     resetStateToDefault();
-    draw_shapes();
-  } else if (event.key === 'Delete') {
+  } else if (
+    event.key === 'Delete' &&
+    document.activeElement.id !== 'position'
+  ) {
     if (current_shape_index !== null) {
       shapes.splice(current_shape_index, 1);
       current_shape_index = null;
     }
     resetStateToDefault();
-    saveData();
-    draw_shapes();
   }
 });
 
 let add_shape = function (value) {
   if (value === 'focus-player') {
-    xxxtypeOfShapeToAdd = new FocusPlayer();
+    typeOfShapeToAdd = new FocusPlayer();
   } else if (value === 'opposition-player') {
-    xxxtypeOfShapeToAdd = new OppositionPlayer();
+    typeOfShapeToAdd = new OppositionPlayer();
   } else if (value === 'arrow') {
     console.log('add_player arrow');
-    xxxtypeOfShapeToAdd = new ArrowStarter();
+    typeOfShapeToAdd = new ArrowStarter();
   }
-  xxxshapeAddingToolButtonHasBeenClicked = true;
+  shapeAddingToolButtonHasBeenClicked = true;
 };
 
 // State is set to normal dragging mode
 // TODO fix allow_move
 let allow_move = function (event) {
-  xxxshapeAddingToolButtonHasBeenClicked = false;
-  xxxmovingPotentialNewShape = false;
-  xxxtypeOfShapeToAdd = null;
-  xxxshapeToAdd = null;
+  shapeAddingToolButtonHasBeenClicked = false;
+  movingPotentialNewShape = false;
+  typeOfShapeToAdd = null;
+  shapeToAdd = null;
 
   draw_shapes();
 };
@@ -188,15 +192,16 @@ let is_mouse_in_arrow = function (x, y, arrow) {
 
 // Handle all mouse down events
 let mouse_down = function (event) {
-  if (xxxshapeAddingToolButtonHasBeenClicked) {
+  console.log('mouse_down ', state);
+  if (shapeAddingToolButtonHasBeenClicked) {
     // initial mousedown to start beginning of arrow
-    if (xxxtypeOfShapeToAdd.shape === 'arrow') {
+    if (typeOfShapeToAdd.shape === 'arrow') {
       startX = parseInt(event.clientX - offset_x);
       startY = parseInt(event.clientY - offset_y);
 
-      xxxshapeAddingToolButtonHasBeenClicked = false;
-      xxxmovingPotentialNewShape = true;
-      xxxshapeToAdd = new Arrow({
+      shapeAddingToolButtonHasBeenClicked = false;
+      movingPotentialNewShape = true;
+      shapeToAdd = new Arrow({
         position: { startX, startY, startX, startY },
       });
       return;
@@ -205,63 +210,64 @@ let mouse_down = function (event) {
   }
 
   // if we are moving a new shape, then we need to add it to the shapes array
-  else if (xxxmovingPotentialNewShape) {
-    console.log('xxxmovingPotentialNewShape ', xxxmovingPotentialNewShape);
+  else if (movingPotentialNewShape) {
+    console.log('movingPotentialNewShape ', movingPotentialNewShape);
     if (
-      xxxtypeOfShapeToAdd.shape === 'circle' ||
-      xxxtypeOfShapeToAdd.shape === 'triangle'
+      typeOfShapeToAdd.shape === 'circle' ||
+      typeOfShapeToAdd.shape === 'triangle'
     ) {
-      shapes.push(xxxshapeToAdd);
-      xxxshapeToAdd = null;
-      xxxmovingPotentialNewShape = false;
-      xxxshapeAddingToolButtonHasBeenClicked = true; // this is so we can add another shape
+      shapes.push(shapeToAdd);
+      shapeToAdd = null;
+      movingPotentialNewShape = false;
+      shapeAddingToolButtonHasBeenClicked = true; // this is so we can add another shape
       saveData();
       return;
-    } else if (xxxtypeOfShapeToAdd.shape === 'arrow') {
-      shapes.push(xxxshapeToAdd);
-      xxxshapeToAdd = null;
-      xxxmovingPotentialNewShape = false;
-      xxxshapeAddingToolButtonHasBeenClicked = true; // this is so we can add another shape
+    } else if (typeOfShapeToAdd.shape === 'arrow') {
+      shapes.push(shapeToAdd);
+      shapeToAdd = null;
+      movingPotentialNewShape = false;
+      shapeAddingToolButtonHasBeenClicked = true; // this is so we can add another shape
       saveData();
       return;
     }
-  }
-
-  // Calculate mouse position and allow dragging if mouse is over a shape
-  startX = parseInt(event.clientX - offset_x);
-  startY = parseInt(event.clientY - offset_y);
-  let index = 0;
-  for (let shape of shapes) {
-    if (shape.shape === 'triangle' || shape.shape == 'circle') {
-      if (is_mouse_in_circle(startX, startY, shape)) {
-        current_shape_index = index;
-        shapes[current_shape_index].isMoving = true;
-        xxx_is_draggin = true;
-        xxxtypeOfShapeMoving = shapes[current_shape_index].shape;
-        populateInfoArea();
-        draw_shapes();
-        return;
+  } else {
+    // Calculate mouse position and allow dragging if mouse is over a shape
+    startX = parseInt(event.clientX - offset_x);
+    startY = parseInt(event.clientY - offset_y);
+    let index = 0;
+    for (let shape of shapes) {
+      if (shape.shape === 'triangle' || shape.shape == 'circle') {
+        if (is_mouse_in_circle(startX, startY, shape)) {
+          current_shape_index = index;
+          shapes[current_shape_index].isMoving = true;
+          isDraggingExistingShape = true;
+          typeOfShapeMoving = shapes[current_shape_index].shape;
+          populateInfoArea();
+          draw_shapes();
+          return;
+        }
+      } else if (shape.shape === 'arrow') {
+        if (is_mouse_in_arrow(startX, startY, shape)) {
+          current_shape_index = index;
+          shapes[current_shape_index].isMoving = true;
+          isDraggingExistingShape = true;
+          typeOfShapeMoving = 'arrow';
+          draw_shapes();
+          return;
+        }
       }
-    } else if (shape.shape === 'arrow') {
-      if (is_mouse_in_arrow(startX, startY, shape)) {
-        current_shape_index = index;
-        shapes[current_shape_index].isMoving = true;
-        xxx_is_draggin = true;
-        xxxtypeOfShapeMoving = 'arrow';
-        draw_shapes();
-        return;
-      }
+      index++;
     }
-    index++;
+    resetStateToDefault();
   }
 };
 
 // Handle all mouse up events
 let mouse_up = function (event) {
-  if (xxx_is_draggin) {
+  if (isDraggingExistingShape) {
     event.preventDefault();
-    xxx_is_draggin = false;
-    xxxtypeOfShapeMoving = '';
+    isDraggingExistingShape = false;
+    typeOfShapeMoving = '';
     draw_shapes();
     saveData();
   }
@@ -286,12 +292,9 @@ let mouse_move = function (event) {
   let dx = mouseX - startX;
   let dy = mouseY - startY;
 
-  if (xxx_is_draggin) {
-    console.log('is dragging ', xxxtypeOfShapeMoving);
-    if (
-      xxxtypeOfShapeMoving === 'circle' ||
-      xxxtypeOfShapeMoving === 'triangle'
-    ) {
+  if (isDraggingExistingShape) {
+    console.log('is dragging ', typeOfShapeMoving);
+    if (typeOfShapeMoving === 'circle' || typeOfShapeMoving === 'triangle') {
       event.preventDefault();
 
       let current_shape = shapes[current_shape_index];
@@ -302,7 +305,7 @@ let mouse_move = function (event) {
       draw_shapes();
       startX = mouseX;
       startY = mouseY;
-    } else if (xxxtypeOfShapeMoving === 'arrow') {
+    } else if (typeOfShapeMoving === 'arrow') {
       let current_shape = shapes[current_shape_index];
 
       current_shape.position.startX += dx;
@@ -317,32 +320,29 @@ let mouse_move = function (event) {
   }
   // initial check to add a new shape before changing state to isMovingNewShape = true
   else if (
-    xxxshapeAddingToolButtonHasBeenClicked &&
-    xxxtypeOfShapeToAdd.shape !== 'arrow'
+    shapeAddingToolButtonHasBeenClicked &&
+    typeOfShapeToAdd.shape !== 'arrow'
   ) {
-    if (xxxshapeToAdd === null) {
-      xxxshapeToAdd = new Player({
+    if (shapeToAdd === null) {
+      shapeToAdd = new Player({
         position: { x: mouseX, y: mouseY },
         number: 0,
-        color: xxxtypeOfShapeToAdd.color,
-        shape: xxxtypeOfShapeToAdd.shape,
+        color: typeOfShapeToAdd.color,
+        shape: typeOfShapeToAdd.shape,
       });
     }
     draw_shapes();
-    xxxmovingPotentialNewShape = true;
-    xxxshapeAddingToolButtonHasBeenClicked = false;
+    movingPotentialNewShape = true;
+    shapeAddingToolButtonHasBeenClicked = false;
   }
   // moving new shape that has not been placed yet
-  else if (
-    xxxmovingPotentialNewShape &&
-    xxxtypeOfShapeToAdd.shape !== 'arrow'
-  ) {
+  else if (movingPotentialNewShape && typeOfShapeToAdd.shape !== 'arrow') {
     if (
-      xxxtypeOfShapeToAdd.shape === 'circle' ||
-      xxxtypeOfShapeToAdd.shape === 'triangle'
+      typeOfShapeToAdd.shape === 'circle' ||
+      typeOfShapeToAdd.shape === 'triangle'
     ) {
-      xxxshapeToAdd.position.x = mouseX;
-      xxxshapeToAdd.position.y = mouseY;
+      shapeToAdd.position.x = mouseX;
+      shapeToAdd.position.y = mouseY;
 
       draw_shapes();
       startX = mouseX;
@@ -350,12 +350,9 @@ let mouse_move = function (event) {
     }
   }
   // moving end of new arrow that has not been placed yet
-  else if (
-    xxxmovingPotentialNewShape &&
-    xxxtypeOfShapeToAdd.shape === 'arrow'
-  ) {
-    xxxshapeToAdd.position.endX = mouseX;
-    xxxshapeToAdd.position.endY = mouseY;
+  else if (movingPotentialNewShape && typeOfShapeToAdd.shape === 'arrow') {
+    shapeToAdd.position.endX = mouseX;
+    shapeToAdd.position.endY = mouseY;
 
     draw_shapes();
   }
@@ -367,25 +364,20 @@ canvas.onmouseup = mouse_up;
 canvas.onmouseout = mouse_out;
 canvas.onmousemove = mouse_move;
 
-// RESET SHAPES to default values
-let resetShapes = function () {
-  for (let shape of shapes) {
-    // shape.isMoving = false;
-    // current_shape_index = null;
-  }
-};
-
 let resetStateToDefault = function () {
-  xxxshapeAddingToolButtonHasBeenClicked = false;
-  xxxmovingPotentialNewShape = false;
-  xxxtypeOfShapeToAdd = null;
-  xxxshapeToAdd = null;
-
   for (let shape of shapes) {
     shape.isMoving = false;
-    current_shape_index = null;
   }
+
+  shapeAddingToolButtonHasBeenClicked = false;
+  movingPotentialNewShape = false;
+  typeOfShapeToAdd = null;
+  shapeToAdd = null;
+  current_shape_index = null;
+
   formForPosition.classList.add('hidden');
+  draw_shapes();
+  saveData();
 };
 
 let populateInfoArea = function () {
@@ -401,8 +393,9 @@ let draw_shapes = function () {
   for (let shape of shapes) {
     shape.draw();
   }
-  if (xxxshapeToAdd) {
-    xxxshapeToAdd.draw();
+
+  if (shapeToAdd) {
+    shapeToAdd.draw();
   }
 };
 
