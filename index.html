@@ -23,17 +23,18 @@
             <button
               class="triangle selection-tool-button"
               value="focus-player"
-              onClick="add_player(this.value)"
+              onClick="add_shape(this.value)"
             ></button>
             <button
               class="circle selection-tool-button"
               value="opposition-player"
-              onClick="add_player(this.value)"
+              onClick="add_shape(this.value)"
             ></button>
             <button
               class="arrow selection-tool-button"
               data-player="arrow"
-              onClick="add_arrow()"
+              value="arrow"
+              onClick="add_shape(this.value)"
             ></button>
           </div>
           <canvas id="canvas"></canvas>

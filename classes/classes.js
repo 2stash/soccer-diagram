@@ -77,11 +77,14 @@ class Arrow {
     radius = 10,
     color = 'black',
     lineWidth = 5, // will be shown in the saved version but is not connected to the preview width of the arrow
+    isMoving = false,
   }) {
     this.position = position;
     this.radius = radius;
     this.color = color;
     this.lineWidth = lineWidth;
+    this.shape = 'arrow';
+    this.isMoving = isMoving;
   }
 
   draw() {
@@ -140,5 +143,12 @@ class OppositionPlayer {
   constructor() {
     this.color = 'rgba(255,0,0,1)';
     this.shape = 'circle';
+  }
+}
+
+class ArrowStarter {
+  constructor() {
+    this.color = 'black';
+    this.shape = 'arrow';
   }
 }
