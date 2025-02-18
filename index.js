@@ -10,10 +10,10 @@ canvas.height = 1104;
 let canvas_width = canvas.width;
 let canvas_height = canvas.height;
 
-// STATE
-let xxxmouseIsOverCanvas = false; // TODO use:
-let xxxdraggingExistingShape = false; // TODO use:
+let background = new Image();
+background.src = 'soccerField3.jpg';
 
+// STATE
 let shapeAddingToolButtonHasBeenClicked = false;
 let movingPotentialNewShape = false;
 let typeOfShapeToAdd = null;
