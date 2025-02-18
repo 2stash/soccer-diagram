@@ -232,6 +232,7 @@ let mouse_down = function (event) {
     }
   } else {
     // Calculate mouse position and allow dragging if mouse is over a shape
+    resetStateToDefault();
     startX = parseInt(event.clientX - offset_x);
     startY = parseInt(event.clientY - offset_y);
     let index = 0;
@@ -258,7 +259,6 @@ let mouse_down = function (event) {
       }
       index++;
     }
-    resetStateToDefault();
   }
 };
 
