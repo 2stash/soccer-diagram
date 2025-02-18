@@ -12,7 +12,7 @@ let canvas_height = canvas.height;
 
 // STATE
 let xxxmouseIsOverCanvas = false; // TODO use:
-let xxxdraggingExistingShape = false;
+let xxxdraggingExistingShape = false; // TODO use:
 
 let shapeAddingToolButtonHasBeenClicked = false;
 let movingPotentialNewShape = false;

@@ -19,16 +19,7 @@ class Player {
   draw() {
     if (this.shape === 'circle') {
       if (this.isMoving) {
-        context.fillStyle = 'rgba(255,0,0,.5)';
-        context.beginPath();
-        context.arc(
-          this.position.x,
-          this.position.y,
-          this.radius + 5,
-          0,
-          2 * Math.PI
-        );
-        context.fill();
+        this._highlightShapeForMoving();
       }
 
       context.beginPath();
@@ -47,13 +38,7 @@ class Player {
       context.fillText(this.number, this.position.x - 10, this.position.y + 10);
     } else if (this.shape === 'triangle') {
       if (this.isMoving) {
-        context.fillStyle = 'rgba(255,0,0,.5)';
-        context.beginPath();
-        context.moveTo(this.position.x, this.position.y - 30);
-        context.lineTo(this.position.x - 30, this.position.y + 30);
-        context.lineTo(this.position.x + 30, this.position.y + 30);
-        context.closePath();
-        context.fill();
+        this._highlightShapeForMoving();
       }
 
       context.beginPath();
@@ -68,6 +53,18 @@ class Player {
       context.fillStyle = 'white';
       context.fillText(this.number, this.position.x - 8, this.position.y + 18);
     }
+  }
+  _highlightShapeForMoving() {
+    context.beginPath();
+    context.strokeStyle = 'rgba(0,221,245,.5)';
+
+    context.rect(
+      this.position.x - this.radius - 5,
+      this.position.y - this.radius - 5,
+      60,
+      60
+    );
+    context.stroke();
   }
 }
 
@@ -94,7 +91,23 @@ class Arrow {
     let angle;
     let x;
     let y;
-    context.fillStyle = this.color;
+
+    if (this.isMoving) {
+      let xLength = Math.abs(this.position.startX - this.position.endX);
+      let yLength = Math.abs(this.position.startY - this.position.endY);
+      context.beginPath();
+      context.strokeStyle = 'rgba(0,221,245,.5)';
+
+      context.rect(
+        (this.position.startX + this.position.endX) / 2 - (30 + xLength) / 2,
+        (this.position.startY + this.position.endY) / 2 - (30 + yLength) / 2,
+        xLength + 30,
+        yLength + 30
+      );
+      context.stroke();
+    }
+    context.strokeStyle = 'rgba(0,0,0,1)'; // set Line color
+    context.fillStyle = this.color; // set arrow head color
     context.lineWidth = this.lineWidth;
     context.beginPath();
     context.moveTo(this.position.startX, this.position.startY);
