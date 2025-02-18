@@ -116,6 +116,7 @@ document.addEventListener('keydown', function (event) {
 });
 
 let add_shape = function (value) {
+  resetStateToDefault();
   if (value === 'focus-player') {
     typeOfShapeToAdd = new FocusPlayer();
   } else if (value === 'opposition-player') {
@@ -128,14 +129,8 @@ let add_shape = function (value) {
 };
 
 // State is set to normal dragging mode
-// TODO fix allow_move
 let allow_move = function (event) {
-  shapeAddingToolButtonHasBeenClicked = false;
-  movingPotentialNewShape = false;
-  typeOfShapeToAdd = null;
-  shapeToAdd = null;
-
-  draw_shapes();
+  resetStateToDefault();
 };
 
 // MOUSE EVENTS
@@ -275,14 +270,9 @@ let mouse_up = function (event) {
 };
 
 // Handle all mouse out events
-// TODO redo mouse_out logic
 let mouse_out = function (event) {
-  // reset selected shape to null when scorlling off the screen
-  // can change later to some other functionality
-  shapeToAdd = null;
-  isMovingNewShape = false;
-
-  draw_shapes();
+  // Currently no logic
+  // Reset of shape select is done on shape select function
 };
 
 // Handle all mouse move events
