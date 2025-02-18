@@ -167,22 +167,23 @@ let is_mouse_in_circle = function (x, y, shape) {
 let is_mouse_in_arrow = function (x, y, arrow) {
   // arrow starting and ending points can be on either side, so need to find which is farthest left and right, and farthest top and bottom
 
+  const padding = 10; // padding to make arrow clicking on easier
   let shape_left =
     arrow.position.startX < arrow.position.endX
-      ? arrow.position.startX
-      : arrow.position.endX;
+      ? arrow.position.startX - padding
+      : arrow.position.endX - padding;
   let shape_right =
     arrow.position.startX > arrow.position.endX
-      ? arrow.position.startX + 10 // +10 is to make the hitbox bigger
-      : arrow.position.endX + 10; //  +10 is to make the hitbox bigger
+      ? arrow.position.startX + padding
+      : arrow.position.endX + padding;
   let shape_top =
     arrow.position.startY < arrow.position.endY
-      ? arrow.position.startY + 10 // +10 is to make the hitbox bigger
-      : arrow.position.endY + 10; //  +10 is to make the hitbox bigger
+      ? arrow.position.startY - padding
+      : arrow.position.endY - padding;
   let shape_bottom =
     arrow.position.startY > arrow.position.endY
-      ? arrow.position.startY
-      : arrow.position.endY;
+      ? arrow.position.startY + padding
+      : arrow.position.endY + padding;
 
   if (x > shape_left && x < shape_right && y > shape_top && y < shape_bottom) {
     return true;
